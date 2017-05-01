@@ -3,6 +3,8 @@ using System.Collections;
 
 public class Guard : MonoBehaviour {
 
+    public static event System.Action OnGuardHasSpottedPlayer;
+
     [SerializeField]
 	private Transform pathHolder;
     [SerializeField]
@@ -16,6 +18,8 @@ public class Guard : MonoBehaviour {
     private float speed = 5f;
     private float waitTime = 0.3f;
     private float turnSpeed = 45f;
+    private float timeToSpotPlayer = 0.5f;
+    private float playerVisibleTimer;
 
     private void Awake()
     {
@@ -41,11 +45,21 @@ public class Guard : MonoBehaviour {
     {
         if (CanSeePlayer())
         {
-            spotlight.color = Color.red;
+            playerVisibleTimer += Time.deltaTime;
         }
         else
         {
-            spotlight.color = origSpotlightColor;
+            playerVisibleTimer -= Time.deltaTime;
+        }
+        playerVisibleTimer = Mathf.Clamp(playerVisibleTimer, 0, timeToSpotPlayer);
+        spotlight.color = Color.Lerp(origSpotlightColor, Color.red, playerVisibleTimer / timeToSpotPlayer);
+
+        if (playerVisibleTimer >= timeToSpotPlayer)
+        {
+            if (OnGuardHasSpottedPlayer != null)
+            {
+                OnGuardHasSpottedPlayer();
+            }
         }
     }
 
