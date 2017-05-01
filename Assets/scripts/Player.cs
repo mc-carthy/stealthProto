@@ -2,12 +2,19 @@
 
 public class Player : MonoBehaviour {
 
+    private Rigidbody rb;
 	private float moveSpeed = 7f;
     private float smoothMoveTime = 0.1f;
     private float turnSpeed = 8f;
+    private Vector3 velocity;
     private float smoothInputMagnitude;
     private float smoothMoveVelocity;
     private float angle;
+
+    private void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 
     private void Update()
     {
@@ -18,9 +25,14 @@ public class Player : MonoBehaviour {
 
         float targetAngle = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg;
         angle = Mathf.LerpAngle(angle, targetAngle, Time.deltaTime * turnSpeed * inputMagnitude);
-        transform.eulerAngles = Vector3.up * angle;
 
-        transform.Translate(transform.forward * moveSpeed * Time.deltaTime * smoothInputMagnitude, Space.World);
+        velocity = transform.forward * moveSpeed * smoothInputMagnitude;
+    }
+
+    private void FixedUpdate()
+    {
+        rb.MoveRotation(Quaternion.Euler(Vector3.up * angle));
+        rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
     }
 
 }
