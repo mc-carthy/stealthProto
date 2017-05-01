@@ -17,7 +17,7 @@ public class Player : MonoBehaviour {
         smoothInputMagnitude = Mathf.SmoothDamp(smoothInputMagnitude, inputMagnitude, ref smoothMoveVelocity, smoothMoveTime);
 
         float targetAngle = Mathf.Atan2(inputDirection.x, inputDirection.z) * Mathf.Rad2Deg;
-        angle = Mathf.LerpAngle(angle, targetAngle, Time.deltaTime * turnSpeed);
+        angle = Mathf.LerpAngle(angle, targetAngle, Time.deltaTime * turnSpeed * inputMagnitude);
         transform.eulerAngles = Vector3.up * angle;
 
         transform.Translate(transform.forward * moveSpeed * Time.deltaTime * smoothInputMagnitude, Space.World);
