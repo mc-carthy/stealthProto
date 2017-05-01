@@ -2,6 +2,8 @@
 
 public class Player : MonoBehaviour {
 
+    public event System.Action OnReachedEndOfLevel;
+
     private Rigidbody rb;
 	private float moveSpeed = 7f;
     private float smoothMoveTime = 0.1f;
@@ -35,15 +37,22 @@ public class Player : MonoBehaviour {
         velocity = transform.forward * moveSpeed * smoothInputMagnitude;
     }
 
-    private void Disable()
-    {
-        disabled = true;
-    }
-
     private void FixedUpdate()
     {
         rb.MoveRotation(Quaternion.Euler(Vector3.up * angle));
         rb.MovePosition(rb.position + velocity * Time.fixedDeltaTime);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "finish")
+        {
+            Disable();
+            if (OnReachedEndOfLevel != null)
+            {
+                OnReachedEndOfLevel();
+            }
+        }
     }
 
     private void OnDestroy()
@@ -51,4 +60,8 @@ public class Player : MonoBehaviour {
         Guard.OnGuardHasSpottedPlayer -= Disable;
     }
 
+    private void Disable()
+    {
+        disabled = true;
+    }
 }
